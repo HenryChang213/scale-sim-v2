@@ -63,6 +63,7 @@ class scale_config:
         self.ofmap_offset = int(config.get(section, 'OfmapOffset'))
         self.df = config.get(section, 'Dataflow')
         self.memory_banks = int(config.get(section, 'MemoryBanks').strip())
+        # self.word_size = int(config.get(section, 'WordSize'))
 
         # Anand: ISSUE #2. Patch
         if self.use_user_bandwidth:
@@ -335,6 +336,10 @@ class scale_config:
     def get_mem_banks(self):
         if self.valid_conf_flag:
             return self.memory_banks
+    
+    # def get_word_size(self):
+    #     if self.valid_conf_flag:
+    #         return self.word_size
 
     def get_mem_map_obj(self):
         if self.valid_conf_flag:

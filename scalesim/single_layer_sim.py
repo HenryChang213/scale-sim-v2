@@ -99,6 +99,7 @@ class single_layer_sim:
     # This communicates that the memory is being managed externally
     # And the class will not interfere with setting it up
     def set_memory_system(self, mem_sys_obj=mem_dbsp()):
+        print('DEBUG: Setting up memory system externally')
         self.memory_system = mem_sys_obj
         self.memory_system_ready_flag = True
 
@@ -128,8 +129,10 @@ class single_layer_sim:
         # 2. Setup the memory system and run the demands through it to find any memory bottleneck and generate traces
 
         # 2.1 Setup the memory system if it was not setup externally
+        # print('setup memory system', self.memory_system_ready_flag)
         if not self.memory_system_ready_flag:
-            word_size = 1           # bytes, this can be incorporated in the config file
+            word_size = 1 #self.config.get_word_size()           # bytes, this can be incorporated in the config file
+            # print('worddddddd size:', word_size)
             active_buf_frac = 0.5   # This can be incorporated in the config as well
 
             ifmap_buf_size_kb, filter_buf_size_kb, ofmap_buf_size_kb = self.config.get_mem_sizes()

@@ -181,8 +181,9 @@ class systolic_compute_ws:
         inter_fold_gap_prefix = self.arr_row
         inter_fold_gap_prefix_mat = np.ones((inter_fold_gap_prefix, self.arr_row)) * -1
 
-        inter_fold_gap_suffix = self.arr_row + self.arr_col - 2
-        #The last input needs self.arr_row - 1 cycles to reach the last column of PE array and then self.arr_col - 1 cycles to reduce along the last column.
+        #inter_fold_gap_suffix = self.arr_row + self.arr_col - 2
+        inter_fold_gap_suffix = self.arr_col - 1
+        #The last input need self.arr_col - 1 cycles to reduce along the last column.
 
         inter_fold_gap_suffix_mat = np.ones((inter_fold_gap_suffix, self.arr_row)) * -1
 
@@ -196,20 +197,20 @@ class systolic_compute_ws:
                 # See the comment on ifmap_prefetch generation
                 this_fold_demand = self.ifmap_op_mat[:,col_start_id: col_end_idx]
                 self.ifmap_reads += this_fold_demand.shape[0] * this_fold_demand.shape[1]
-
+                
                 # Take into account under utilization
                 if delta > 0:
                     null_req_mat = np.ones((self.T, delta)) * -1
                     this_fold_demand = np.concatenate((this_fold_demand, null_req_mat), axis=1)
 
-                # Account for the cycles for weights to load
-                this_fold_demand = np.concatenate((inter_fold_gap_prefix_mat, this_fold_demand), axis=0)
-
-                # Account for the cycles for final output to drain out
-                this_fold_demand = np.concatenate((this_fold_demand, inter_fold_gap_suffix_mat), axis=0)
-
                 # Add skew to the IFMAP demand matrix to reflect systolic pipeline fill
                 this_fold_demand = skew_matrix(this_fold_demand)
+
+                # Account for the cycles for input to traverse systolic array
+                this_fold_demand = np.concatenate((this_fold_demand, inter_fold_gap_suffix_mat), axis=0)
+
+                # Account for the cycles for weights to load
+                this_fold_demand = np.concatenate((inter_fold_gap_prefix_mat, this_fold_demand), axis=0)
 
                 if fr == 0 and fc == 0:
                     self.ifmap_demand_matrix = this_fold_demand
